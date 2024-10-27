@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+package models;
 
 public class Member {
     private int memberId;
@@ -7,7 +6,7 @@ public class Member {
     private String email;
     private String membershipPlan;
     
-    private List<String> progressHistory = new ArrayList<>();
+    
     private double balanceDue;
     
     public Member(int memberId, String name, String email, String membershipPlan) {
@@ -44,22 +43,20 @@ public class Member {
 
 
     public void setEmail(String email) {
-        this.email = email;
-    }
-
-
-    public void addProgress(String progress) {
-        progressHistory.add(progress);
-        System.out.println("Progress added: " + progress);
-    }
-
-    public void viewProgress() {
-        System.out.println("Progress History for " + name);
-        for (String progress : progressHistory) {
-            System.out.println(progress);
+        if(email != null && email.endsWith("@gmial.com")){
+            this.email = email + "@gmial.com";
+        } else {
+            this.email = email;
         }
     }
 
+    public String getMembershipPlan() {
+        return membershipPlan;
+    }
+
+    public void setMembershipPlan(String membershipPlan) {
+        this.membershipPlan = membershipPlan;
+    }
     
     public void makePayment(double amount) {
         balanceDue -= amount;
@@ -70,5 +67,8 @@ public class Member {
         System.out.println("Balance due: $" + balanceDue);
     }
     
+    public String toString() {
+        return String.format("%s %s %s %s", memberId, name, email, membershipPlan);
+    }
     
 }

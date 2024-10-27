@@ -1,3 +1,5 @@
+package models;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +72,10 @@ public class Trainer {
         members.add(member);
         member.addProgress(progress);
         System.out.println("Progress added for member: " + member.getName());
+    }
+
+    public String toString(){
+        return String.format("%s %s %s", trainerId, name, specialization);
     }
 
 

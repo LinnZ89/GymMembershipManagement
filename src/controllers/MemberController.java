@@ -1,114 +1,121 @@
 package controllers;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import models.History;
+import models.MemberProgress;
 import models.Member;
 
 public class MemberController {
     
-    private List<Member> members = new ArrayList<>();
-    private List<History> progressHistory = new ArrayList<>();
+    private List<Member> members;
+    private List<MemberProgress> progressHistory;
 
     public MemberController() {
-        members = new ArrayList<>();
-        progressHistory = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.progressHistory = new ArrayList<>();
     }
 
     public List<Member> getMembers() {
         return members;
     }
+
     public void setMembers(List<Member> members) {
         this.members = members;
     }
-    public List<History> getProgressHistory() {
+
+    public List<MemberProgress> getProgressHistory() {
         return progressHistory;
     }
-    public void setProgressHistory(List<History> progressHistory) {
+
+    public void setProgressHistory(List<MemberProgress> progressHistory) {
         this.progressHistory = progressHistory;
     }
 
-    public Member getMemberByID(int memberID){
-        for(Member member : members){
-            if(member.getMemberId() == memberID){
+    public Member getMemberByID(int memberID) {
+        for (Member member : members) {
+            if (member.getMemberId() == memberID) {
                 return member;
             }
         }
         return null;
     }
 
-    public void addMember(Member member){
-        if(member != null){
+    public void addMember(Member member) {
+        if (member != null) {
             members.add(member);
         }
     }
 
-    public void addProgressHistory(History history){
-        if(history != null){
-            progressHistory.add(history);
+    public void addProgressHistory(MemberProgress progress) {
+        if (progress != null) {
+            progressHistory.add(progress);
         }
     }
 
-    public List<Member> searchMemberByID(int memberID){
+    public List<Member> searchMemberByID(int memberID) {
         List<Member> result = new ArrayList<>();
-        for(Member member : members){
-            if(member.getMemberId() == memberID){
+        for (Member member : members) {
+            if (member.getMemberId() == memberID) {
                 result.add(member);
             }
         }
         return result;
     }
 
-    public List<Member> searchMemberByName(String name){
+    public List<Member> searchMemberByName(String name) {
         List<Member> result = new ArrayList<>();
-        for(Member member : members){
-            if(member.getName().equalsIgnoreCase(name)){
+        for (Member member : members) {
+            if (member.getName().equalsIgnoreCase(name)) {
                 result.add(member);
             }
         }
         return result;
     }
 
-    public boolean updateMember(int newMemverID, String newName, String newEmail, String newMembershipPlan){
-        Member member = getMemberByID(newMemverID);
+    public boolean updateMember(int memberID, String newName, String newEmail, String newMembershipPlan) {
+        Member member = getMemberByID(memberID);
 
-        if(member != null){
+        if (member != null) {
             member.setName(newName);
-            if(newEmail != null && newEmail.endsWith("@gmail.com")){
+            if (newEmail != null && !newEmail.endsWith("@gmail.com")) {
                 newEmail = newEmail + "@gmail.com";
             }
             member.setEmail(newEmail);
             member.setMembershipPlan(newMembershipPlan);
+            return true;
         }
-        return true;
+        return false;
     }
 
-    public Member deleteMember(int memberID){
-        for(int i = 0; i < members.size(); i++){
-            if(members.get(i).getMemberId() == memberID)
-                return members.get(i);
+    public boolean deleteMember(int memberID) {
+        Member member = getMemberByID(memberID);
+        if (member != null) {
+            members.remove(member);
+            return true;
         }
-        return null;
+        return false;
     }
 
-    public String toStirng(){
-        if(members.isEmpty()){
-            return null;
+    @Override
+    public String toString() {
+        if (members.isEmpty()) {
+            return "No members available.";
         }
-        String str = String.format("|%15s|%15s|%25s|%35s|\n", "MemberID", "Name", "Email", 
-        "Membership Plan");
-        for(Member member : members){
-            str += String.format("|%15d|%15s|%25s|%35s|\n", member.getMemberId(), member.getName(), 
-            member.getEmail(), member.getMembershipPlan());
+        StringBuilder str = new StringBuilder(String.format("|%15s|%15s|%25s|%35s|\n", "MemberID", "Name", "Email", "Membership Plan"));
+        for (Member member : members) {
+            str.append(String.format("|%15d|%15s|%25s|%35s|\n", member.getMemberId(), member.getName(), member.getEmail(), member.getMembershipPlan()));
         }
-        return str;
+        return str.toString();
     }
 
-    public void viewProgress(){
-        for (History history : progressHistory) {
-            System.out.println(history.toString());
+    public void viewProgress() {
+        if (progressHistory.isEmpty()) {
+            System.out.println("No member progress history available.");
+        } else {
+            for (MemberProgress progress : progressHistory) {
+                System.out.println(progress.toString());
+            }
         }
     }
-        
 }
-

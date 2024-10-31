@@ -1,4 +1,4 @@
-
+package models;
 
 public class Admin {
     private String username;
@@ -16,6 +16,5 @@ public class Admin {
     public String getPassword() {
         return password;
     }
-
 
 }

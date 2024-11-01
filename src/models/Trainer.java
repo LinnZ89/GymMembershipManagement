@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Trainer {
-    private int trainerId;
+    private String trainerId;
     private String name;
     private String specialization;
 
@@ -12,20 +12,20 @@ public class Trainer {
     private List<String> sessions = new ArrayList<>();
     private List<Member> members = new ArrayList<>();
 
-    public Trainer(int trainerId, String name, String specialization) {
+    public Trainer(String trainerId, String name, String specialization) {
         this.trainerId = trainerId;
         this.name = name;
         this.specialization = specialization;
     }
 
 
-    public int getTrainerId() {
+    public String getTrainerId() {
         return trainerId;
     }
 
 
 
-    public void setTrainerId(int trainerId) {
+    public void setTrainerId(String trainerId) {
         this.trainerId = trainerId;
     }
 

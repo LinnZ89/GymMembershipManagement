@@ -1,6 +1,6 @@
 package models;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class MembershipPlan {
     private String planId;

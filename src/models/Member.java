@@ -4,28 +4,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
-    private int memberId;
+    private String memberId;
     private String name;
     private String email;
-    private String membershipPlan;
+    private String membershipPlanId;
     
     private List<String> progressHistory = new ArrayList<>();
     private double balanceDue;
     
-    public Member(int memberId, String name, String email, String membershipPlan) {
+    public Member(String memberId, String name, String email, String membershipPlan) {
         this.memberId = memberId;
         this.name = name;
         this.email = email;
-        this.membershipPlan = membershipPlan;
+        this.membershipPlanId = membershipPlanId;
     }
 
     
-    public int getMemberId() {
+    public String getMemberId() {
         return memberId;
     }
 
 
-    public void setMemberId(int memberId) {
+    public void setMemberId(String memberId) {
         this.memberId = memberId;
     }
 
@@ -47,6 +47,17 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+
+
+    public String getMembershipPlanId() {
+        return membershipPlanId;
+    }
+
+
+    public void setMembershipPlanId(String membershipPlanId) {
+        this.membershipPlanId = membershipPlanId;
     }
 
 

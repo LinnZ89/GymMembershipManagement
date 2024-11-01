@@ -1,173 +1,74 @@
 package controllers;
 
-import java.util.Date;
+import models.MembershipPlan;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import models.MembershipPlan;
 import java.util.Scanner;
 
 public class MembershipPlanController {
+    private List<MembershipPlan> membershipPlans = new ArrayList<>();
 
-    private List<MembershipPlan> membershipPlans;
-
-    public MembershipPlanController() {
-        this.membershipPlans = new ArrayList<>();
-    }
-
-    public List<MembershipPlan> getMembershipPlans() {
-        return membershipPlans;
-    }
-
-    public void setMembershipPlans(List<MembershipPlan> membershipPlans) {
-        this.membershipPlans = membershipPlans;
-    }
-
-    public void menu() {
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
-        while (running) {
-            System.out.println("\n--- Membership Plan Menu ---");
-            System.out.println("1. Create Membership Plan");
-            System.out.println("2. Delete Membership Plan");
-            System.out.println("3. Update Membership Plan");
-            System.out.println("4. View All Membership Plans");
-            System.out.println("5. Back To Main Menu");
-            System.out.print("Choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); 
-
-            switch (choice) {
-                case 1:
-                    createMembershipPlan(scanner);
-                    break;
-                
-                case 2:
-                    deleteMembershipPlan(scanner);
-                    break;
-                
-                case 3:
-                    updateMembershipPlan(scanner);
-                    break;
-                
-                case 4:
-                    System.out.println(toString());
-                    break;
-
-                case 5:
-                    running = false;
-                    System.out.println("Exiting Membership Plan Menu...");
-                    break;
-                    
-                default:
-                    System.out.println("Invalid option. Please try again.");
-                    break;
-            }
-        }
-    }
-
-    private void createMembershipPlan(Scanner scanner) {
+    public MembershipPlan createMembershipPlan(Scanner scanner) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        
         System.out.print("Enter Plan ID: ");
         String planId = scanner.nextLine();
+        
         System.out.print("Enter Plan Type: ");
         String planType = scanner.nextLine();
-
+        
         System.out.print("Enter Plan Price: ");
         double price = scanner.nextDouble();
         scanner.nextLine();
 
         System.out.print("Enter Plan Status (Active/Inactive): ");
         String status = scanner.nextLine();
-
-        System.out.print("Enter Start Date (dd/MM/yyyy): ");
+        
         Date dayStart = null;
+        System.out.print("Enter Start Date (dd/MM/yyyy): ");
         try {
             dayStart = dateFormat.parse(scanner.nextLine());
         } catch (ParseException e) {
             System.out.println("Invalid date format. Please use dd/MM/yyyy.");
-            return;
+            return null; 
         }
 
-        System.out.print("Enter End Date (dd/MM/yyyy): ");
         Date dayEnd = null;
+        System.out.print("Enter End Date (dd/MM/yyyy): ");
         try {
             dayEnd = dateFormat.parse(scanner.nextLine());
+            if (!validateDates(dayStart, dayEnd)) {
+                System.out.println("End date must be after the start date.");
+                return null;
+            }
         } catch (ParseException e) {
             System.out.println("Invalid date format. Please use dd/MM/yyyy.");
-            return;
+            return null; 
         }
 
-        System.out.print("Enter Member ID: ");
+        System.out.print("Enter Member ID associated with this plan: ");
         String memberId = scanner.nextLine();
 
-    
         MembershipPlan newPlan = new MembershipPlan(planId, dayStart, dayEnd, planType, price, status, memberId);
         addMembershipPlan(newPlan);
         System.out.println("Membership plan created successfully!");
-    }
-
-
-    private void deleteMembershipPlan(Scanner scanner) {
-        System.out.print("Enter Plan ID to delete: ");
-        String planId = scanner.nextLine();
-
-        if (deleteMembershipPlan(planId)) {
-            System.out.println("Membership plan deleted successfully!");
-        } else {
-            System.out.println("Plan not found. Deletion failed.");
-        }
-    }
-
-    private void updateMembershipPlan(Scanner scanner) {
-        System.out.print("Enter Plan ID to update: ");
-        String planId = scanner.nextLine();
-        
-        MembershipPlan plan = getPlanById(planId);
-        if (plan != null) {
-            System.out.print("Enter new Plan Type (current: " + plan.getPlanType() + "): ");
-            String newPlanType = scanner.nextLine();
-            System.out.print("Enter new Plan Price (current: " + plan.getPrice() + "): ");
-            double newPrice = scanner.nextDouble();
-            scanner.nextLine();
-            System.out.print("Enter new Plan Status (current: " + plan.getStatus() + "): ");
-            String newStatus = scanner.nextLine();
-
-            if (updateMembershipPlan(planId, newPlanType, newPrice, newStatus)) {
-                System.out.println("Membership plan updated successfully!");
-            } else {
-                System.out.println("Failed to update membership plan.");
-            }
-        } else {
-            System.out.println("Plan not found.");
-        }
-    }
-
-    public MembershipPlan getPlanById(String planId) {
-        for (MembershipPlan plan : membershipPlans) {
-            if (plan.getPlanId().equals(planId)) {
-                return plan;
-            }
-        }
-        return null;
+        return newPlan;
     }
 
     public void addMembershipPlan(MembershipPlan plan) {
-        if (plan != null) {
+        if (plan != null && validateDates(plan.getDayStart(), plan.getDayEnd())) {
             membershipPlans.add(plan);
+            System.out.println("Membership plan added.");
+        } else {
+            System.out.println("Invalid plan details.");
         }
     }
 
-    public boolean updateMembershipPlan(String planId, String newPlanType, double newPrice, String newStatus) {
-        MembershipPlan plan = getPlanById(planId);
-        if (plan != null) {
-            plan.setPlanType(newPlanType);
-            plan.setPrice(newPrice);
-            plan.setStatus(newStatus);
-            return true;
-        }
-        return false;
+    private boolean validateDates(Date start, Date end) {
+        return end.after(start);
     }
 
     public boolean deleteMembershipPlan(String planId) {
@@ -179,25 +80,112 @@ public class MembershipPlanController {
         return false;
     }
 
-    public List<MembershipPlan> searchPlansByType(String planType) {
-        List<MembershipPlan> result = new ArrayList<>();
+    public MembershipPlan getPlanById(String planId) {
         for (MembershipPlan plan : membershipPlans) {
-            if (plan.getPlanType().equalsIgnoreCase(planType)) {
-                result.add(plan);
+            if (plan.getPlanId().equals(planId)) {
+                return plan;
             }
         }
-        return result;
+        return null;
     }
 
-    @Override
-    public String toString() {
+    public boolean updateMembershipPlan(Scanner scanner) {
+        System.out.print("Enter the Plan ID of the plan you wish to update: ");
+        String planId = scanner.nextLine();
+        
+        MembershipPlan plan = getPlanById(planId);
+        if (plan == null) {
+            System.out.println("Plan with ID " + planId + " not found.");
+            return false;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        
+        System.out.println("Updating details for Plan ID: " + planId);
+
+        // Update Plan Type
+        System.out.print("Enter new Plan Type (current: " + plan.getPlanType() + "): ");
+        String newPlanType = scanner.nextLine();
+        if (!newPlanType.isEmpty()) {
+            plan.setPlanType(newPlanType);
+        }
+
+        // Update Plan Price
+        System.out.print("Enter new Plan Price (current: " + plan.getPrice() + "): ");
+        String priceInput = scanner.nextLine();
+        if (!priceInput.isEmpty()) {
+            try {
+                double newPrice = Double.parseDouble(priceInput);
+                plan.setPrice(newPrice);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid price. Keeping the current price.");
+            }
+        }
+
+        // Update Plan Status
+        System.out.print("Enter new Plan Status (current: " + plan.getStatus() + "): ");
+        String newStatus = scanner.nextLine();
+        if (!newStatus.isEmpty()) {
+            plan.setStatus(newStatus);
+        }
+
+        // Update Start Date
+        System.out.print("Enter new Start Date (dd/MM/yyyy, current: " + dateFormat.format(plan.getDayStart()) + "): ");
+        String startDateInput = scanner.nextLine();
+        if (!startDateInput.isEmpty()) {
+            try {
+                Date newDayStart = dateFormat.parse(startDateInput);
+                if (validateDates(newDayStart, plan.getDayEnd())) {
+                    plan.setDayStart(newDayStart);
+                } else {
+                    System.out.println("Invalid date. Start date must be before the end date.");
+                }
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Keeping the current start date.");
+            }
+        }
+
+        // Update End Date
+        System.out.print("Enter new End Date (dd/MM/yyyy, current: " + dateFormat.format(plan.getDayEnd()) + "): ");
+        String endDateInput = scanner.nextLine();
+        if (!endDateInput.isEmpty()) {
+            try {
+                Date newDayEnd = dateFormat.parse(endDateInput);
+                if (validateDates(plan.getDayStart(), newDayEnd)) {
+                    plan.setDayEnd(newDayEnd);
+                } else {
+                    System.out.println("Invalid date. End date must be after the start date.");
+                }
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Keeping the current end date.");
+            }
+        }
+
+        System.out.println("Membership plan updated successfully.");
+        return true;
+    }
+
+    public void viewAllMembershipPlans() {
         if (membershipPlans.isEmpty()) {
-            return "No membership plans available.";
+            System.out.println("No membership plans available.");
+            return;
         }
-        StringBuilder str = new StringBuilder(String.format("|%15s|%20s|%10s|%15s|\n", "Plan ID", "Type", "Price", "Status"));
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        System.out.println(String.format("| %-10s | %-15s | %-10s | %-10s | %-12s | %-15s | %-10s |", 
+                                         "Plan ID", "Type", "Price", "Status", "Start Date", "End Date", "Member ID"));
+        System.out.println("-------------------------------------------------------------------------------------------");
+        
         for (MembershipPlan plan : membershipPlans) {
-            str.append(String.format("|%15s|%20s|%10.2f|%15s|\n", plan.getPlanId(), plan.getPlanType(), plan.getPrice(), plan.getStatus()));
+            System.out.println(String.format("| %-10s | %-15s | %-10.2f | %-10s | %-12s | %-15s | %-10s |", 
+                                             plan.getPlanId(),
+                                             plan.getPlanType(),
+                                             plan.getPrice(),
+                                             plan.getStatus(),
+                                             dateFormat.format(plan.getDayStart()),
+                                             dateFormat.format(plan.getDayEnd()),
+                                             plan.getMemberId()));
         }
-        return str.toString();
     }
 }
+

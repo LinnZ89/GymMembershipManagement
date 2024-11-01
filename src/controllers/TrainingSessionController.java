@@ -1,89 +1,119 @@
 package controllers;
 
-import java.util.ArrayList;
-import java.util.List;
 import models.TrainingSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 public class TrainingSessionController {
+    private List<TrainingSession> trainingSessions = new ArrayList<>();
 
-    private List<TrainingSession> trainingSessions;
+    public TrainingSession createTrainingSession(Scanner scanner) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-    public TrainingSessionController() {
-        this.trainingSessions = new ArrayList<>();
-    }
+        System.out.print("Enter Session ID: ");
+        String sessionId = scanner.nextLine();
 
-    public List<TrainingSession> getTrainingSessions() {
-        return trainingSessions;
-    }
-
-    public void setTrainingSessions(List<TrainingSession> trainingSessions) {
-        this.trainingSessions = trainingSessions;
-    }
-
-    public TrainingSession getSessionById(String sessionId) {
-        for (TrainingSession session : trainingSessions) {
-            if (session.getSessionId().equals(sessionId)) {
-                return session;
-            }
+        System.out.print("Enter Start Date (dd/MM/yyyy): ");
+        Date dayStart = null;
+        try {
+            dayStart = dateFormat.parse(scanner.nextLine());
+        } catch (ParseException e) {
+            System.out.println("Invalid date format. Please use dd/MM/yyyy.");
+            return null;
         }
-        return null;
+
+        System.out.print("Enter End Date (dd/MM/yyyy): ");
+        Date dayEnd = null;
+        try {
+            dayEnd = dateFormat.parse(scanner.nextLine());
+            if (dayEnd.before(dayStart)) {
+                System.out.println("End date must be after the start date.");
+                return null;
+            }
+        } catch (ParseException e) {
+            System.out.println("Invalid date format. Please use dd/MM/yyyy.");
+            return null;
+        }
+
+        System.out.print("Enter Session Location: ");
+        String sessionLocation = scanner.nextLine();
+
+        System.out.print("Enter Member ID: ");
+        String memberId = scanner.nextLine();
+
+        System.out.print("Enter Trainer ID: ");
+        String trainerId = scanner.nextLine();
+
+        TrainingSession newSession = new TrainingSession(sessionId, dayStart, dayEnd, sessionLocation, memberId, trainerId);
+        this.addTrainingSession(newSession);
+        System.out.println("Training session created successfully!");
+        return newSession;
     }
 
     public void addTrainingSession(TrainingSession session) {
-        if (session != null) {
+        if (session != null && session.getDayStart().before(session.getDayEnd())) {
             trainingSessions.add(session);
+            System.out.println("Training session added.");
+        } else {
+            System.out.println("Invalid session details.");
         }
-    }
-
-    public boolean updateTrainingSession(String sessionId, String newLocation, String newTrainerId, String newTime) {
-        TrainingSession session = getSessionById(sessionId);
-        if (session != null) {
-            session.setSessionLocation(newLocation);
-            session.setTrainerId(newTrainerId);
-            session.setSessionTime(newTime);
-            return true;
-        }
-        return false;
     }
 
     public boolean deleteTrainingSession(String sessionId) {
         TrainingSession session = getSessionById(sessionId);
         if (session != null) {
             trainingSessions.remove(session);
+            System.out.println("Training session deleted successfully.");
             return true;
         }
+        System.out.println("Training session not found.");
         return false;
     }
 
-    public List<TrainingSession> searchSessionsByTrainer(String trainerId) {
-        List<TrainingSession> result = new ArrayList<>();
-        for (TrainingSession session : trainingSessions) {
-            if (session.getTrainerId().equalsIgnoreCase(trainerId)) {
-                result.add(session);
-            }
+    public boolean updateTrainingSession(String sessionId, String newLocation, String newTrainerId) {
+        TrainingSession session = getSessionById(sessionId);
+        if (session != null) {
+            session.setSessionLocation(newLocation);
+            session.setTrainerId(newTrainerId);
+            System.out.println("Training session updated successfully.");
+            return true;
         }
-        return result;
+        System.out.println("Training session not found.");
+        return false;
     }
 
-    public List<TrainingSession> searchSessionsByDate(String date) {
-        List<TrainingSession> result = new ArrayList<>();
-        for (TrainingSession session : trainingSessions) {
-            if (session.getSessionDate().equals(date)) {
-                result.add(session);
+    public TrainingSession getSessionById(String trainingSessionId) {
+        for (TrainingSession trainingSession : trainingSessions) {
+            if (trainingSession.getMemberId() == trainingSessionId) {
+                return trainingSession;
             }
         }
-        return result;
+        return null;
     }
 
-    @Override
-    public String toString() {
+    public void viewAllTrainingSessions() {
         if (trainingSessions.isEmpty()) {
-            return "No training sessions available.";
+            System.out.println("No training sessions available.");
+            return;
         }
-        StringBuilder str = new StringBuilder(String.format("|%15s|%20s|%15s|%15s|\n", "Session ID", "Location", "Trainer ID", "Time"));
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        System.out.println(String.format("| %-12s | %-12s | %-12s | %-15s | %-10s | %-10s |", 
+                                         "Session ID", "Start Date", "End Date", "Location", "Member ID", "Trainer ID"));
+        System.out.println("---------------------------------------------------------------------------------------");
+
         for (TrainingSession session : trainingSessions) {
-            str.append(String.format("|%15s|%20s|%15s|%15s|\n", session.getSessionId(), session.getSessionLocation(), session.getTrainerId(), session.getSessionTime()));
+            System.out.println(String.format("| %-12s | %-12s | %-12s | %-15s | %-10s | %-10s |",
+                                             session.getSessionId(),
+                                             dateFormat.format(session.getDayStart()),
+                                             dateFormat.format(session.getDayEnd()),
+                                             session.getSessionLocation(),
+                                             session.getMemberId(),
+                                             session.getTrainerId()));
         }
-        return str.toString();
     }
 }

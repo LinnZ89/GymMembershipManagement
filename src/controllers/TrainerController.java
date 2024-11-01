@@ -1,99 +1,81 @@
 package controllers;
 
-import java.lang.reflect.Member;
+import models.Trainer;
 import java.util.ArrayList;
 import java.util.List;
-
-import models.Trainer;
+import java.util.Scanner;
 
 public class TrainerController {
     private List<Trainer> trainers = new ArrayList<>();
-    private List<String> sessions = new ArrayList<>();
-    private List<Member> members = new ArrayList<>();
+
+    public Trainer createTrainer (Scanner scanner) {
+        System.out.println("Enter Trainer's ID: ");
+        String trainerId = scanner.nextLine();
+
+        System.out.println("Enter Trainer's Name: ");
+        String trainerName = scanner.nextLine();
+
+        System.out.println("Enter Trainer's Specialization: ");
+        String trainerSpecialization = scanner.nextLine();
+
+        Trainer trainer = new Trainer(trainerId, trainerName, trainerSpecialization);
+        this.addTrainer(trainer);
+        return trainer;
+    }
     
-    public TrainerController(){
-        trainers = new ArrayList<>();
+    public void addTrainer(Trainer trainer) {
+        if (trainer != null) {
+            trainers.add(trainer);
+            System.out.println("Trainer added.");
+        } else {
+            System.out.println("Invalid trainer details.");
+        }
     }
 
-    public List<Trainer> getTrainers() {
-        return trainers;
-    }
-
-    public void setTrainers(List<Trainer> trainers) {
-        this.trainers = trainers;
-    }
-
-    public Trainer getTrainer(int trainerId){
-        for(Trainer trainer : trainers){
-            if(trainer.getTrainerId() == trainerId){
+    public Trainer getTrainerByID(String trainerID) {
+        for (Trainer trainer : trainers) {
+            if (trainer.getTrainerId() == trainerID) {
                 return trainer;
             }
         }
         return null;
     }
 
-    public void addTrainer(Trainer trainer){
-        if(trainer != null){
-            trainers.add(trainer);
-        }
-    }
-
-    public void removeTrainer(int trainerId){
-        Trainer trainer = getTrainer(trainerId);
-        if(trainer != null){
+    public boolean deleteTrainer(String trainerID) {
+        Trainer trainer = getTrainerByID(trainerID);
+        if (trainer != null) {
             trainers.remove(trainer);
+            return true;
         }
+        return false;
     }
 
-    public void updateTrainer(int newTrainerID, String newName, String newSpecialization){
-        Trainer trainer = getTrainer(newTrainerID);
-        if(trainer != null){
+    public boolean updateTrainer(String trainerId, String newName, String newSpecialization) {
+        Trainer trainer = getTrainerByID(trainerId);
+        if (trainer != null) {
             trainer.setName(newName);
             trainer.setSpecialization(newSpecialization);
+            return true;
         }
+        return false;
     }
 
-    public List<Trainer> searchTrainerByName(String name){
-        List<Trainer> result = new ArrayList<>();
-        for(Trainer trainer : trainers){
-            if(trainer.getName().contains(name)){
-                result.add(trainer);
-            }
+    public void viewAllTrainers() {
+        if (trainers.isEmpty()) {
+            System.out.println("No trainers available.");
+            return;
         }
-        return result;
-    }
-    public List<Trainer> searchTrainerByID(int trainerID){
-        List<Trainer> result = new ArrayList<>();
-        for(Trainer trainer : trainers){
-            if(trainer.getTrainerId() == trainerID){
-                result.add(trainer);
-            }
-        }
-        return result;
-    }
 
-
-    public void scheduleSession(String sessionName, String date, int maxParticipants) {
-        String session = sessionName + " on " + date + " (Max: " + maxParticipants + " participants)";
-        sessions.add(session);
-        System.out.println("Session scheduled: " + session);
-    }
-
-    public void viewSessions() {
-        for (String session : sessions) {
-            System.out.println(session);
-        }
-    }
-
-    public String toString(){
-        if(trainers.isEmpty()){
-            return null;
-        }
-        String str = String.format("%15s|%15s|%35s\n", "TrainerID", "Name", "Specialization");
+        System.out.println(String.format("| %-10s | %-20s | %-20s |", "Trainer ID", "Name", "Specialization"));
+        System.out.println("------------------------------------------------------------");
+        
         for (Trainer trainer : trainers) {
-            str += String.format("%15d|%15s|%35s\n", trainer.getTrainerId(), trainer.getName(), trainer.getSpecialization());
+            System.out.println(String.format("| %-10d | %-20s | %-20s |", 
+                trainer.getTrainerId(),
+                trainer.getName(),
+                trainer.getSpecialization()
+            ));
         }
-        return str;
     }
     
 }

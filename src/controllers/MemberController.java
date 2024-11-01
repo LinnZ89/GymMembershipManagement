@@ -1,38 +1,46 @@
 package controllers;
 
+import models.Member;
 import java.util.ArrayList;
 import java.util.List;
-
-import models.MemberProgress;
-import models.Member;
+import java.util.Scanner;
 
 public class MemberController {
-    
-    private List<Member> members;
-    private List<MemberProgress> progressHistory;
-
-    public MemberController() {
-        this.members = new ArrayList<>();
-        this.progressHistory = new ArrayList<>();
-    }
+    private List<Member> members = new ArrayList<>();
 
     public List<Member> getMembers() {
         return members;
     }
+    
+    public Member createMember(Scanner scanner) {
+        System.out.print("Enter Member's ID: ");
+        String memberId = scanner.nextLine();
+        scanner.nextLine(); 
 
-    public void setMembers(List<Member> members) {
-        this.members = members;
+        System.out.print("Enter Member's Name: ");
+        String memberName = scanner.nextLine();
+
+        System.out.print("Enter Member's Email: ");
+        String memberEmail = scanner.nextLine();
+
+        System.out.print("Enter Membership Plan ID: ");
+        String membershipPlanId = scanner.nextLine();
+
+        Member member = new Member(memberId, memberName, memberEmail, membershipPlanId);
+        this.addMember(member);
+        return member;
     }
 
-    public List<MemberProgress> getProgressHistory() {
-        return progressHistory;
+    public void addMember(Member member) {
+        if (member != null && member.getEmail().contains("@")) {
+            members.add(member);
+            System.out.println("Member added successfully.");
+        } else {
+            System.out.println("Invalid member details.");
+        }
     }
 
-    public void setProgressHistory(List<MemberProgress> progressHistory) {
-        this.progressHistory = progressHistory;
-    }
-
-    public Member getMemberByID(int memberID) {
+    public Member getMemberByID(String memberID) {
         for (Member member : members) {
             if (member.getMemberId() == memberID) {
                 return member;
@@ -41,81 +49,49 @@ public class MemberController {
         return null;
     }
 
-    public void addMember(Member member) {
-        if (member != null) {
-            members.add(member);
-        }
-    }
-
-    public void addProgressHistory(MemberProgress progress) {
-        if (progress != null) {
-            progressHistory.add(progress);
-        }
-    }
-
-    public List<Member> searchMemberByID(int memberID) {
-        List<Member> result = new ArrayList<>();
-        for (Member member : members) {
-            if (member.getMemberId() == memberID) {
-                result.add(member);
-            }
-        }
-        return result;
-    }
-
-    public List<Member> searchMemberByName(String name) {
-        List<Member> result = new ArrayList<>();
-        for (Member member : members) {
-            if (member.getName().equalsIgnoreCase(name)) {
-                result.add(member);
-            }
-        }
-        return result;
-    }
-
-    public boolean updateMember(int memberID, String newName, String newEmail, String newMembershipPlan) {
+    public boolean updateMember(String memberID, String newName, String newEmail, String newMembershipPlan) {
         Member member = getMemberByID(memberID);
-
         if (member != null) {
             member.setName(newName);
-            if (newEmail != null && !newEmail.endsWith("@gmail.com")) {
-                newEmail = newEmail + "@gmail.com";
+            if (newEmail != null && !newEmail.contains("@")) {
+                newEmail = newEmail + "@example.com";
             }
             member.setEmail(newEmail);
-            member.setMembershipPlan(newMembershipPlan);
+            member.setMembershipPlanId(newMembershipPlan);
+            System.out.println("Member updated successfully.");
             return true;
         }
+        System.out.println("Member not found.");
         return false;
     }
 
-    public boolean deleteMember(int memberID) {
+    public boolean deleteMember(String memberID) {
         Member member = getMemberByID(memberID);
         if (member != null) {
             members.remove(member);
+            System.out.println("Member deleted successfully.");
             return true;
         }
+        System.out.println("Member not found.");
         return false;
     }
 
-    @Override
-    public String toString() {
+    public void viewAllMembers() {
         if (members.isEmpty()) {
-            return "No members available.";
+            System.out.println("No members available.");
+            return;
         }
-        StringBuilder str = new StringBuilder(String.format("|%15s|%15s|%25s|%35s|\n", "MemberID", "Name", "Email", "Membership Plan"));
-        for (Member member : members) {
-            str.append(String.format("|%15d|%15s|%25s|%35s|\n", member.getMemberId(), member.getName(), member.getEmail(), member.getMembershipPlan()));
-        }
-        return str.toString();
-    }
 
-    public void viewProgress() {
-        if (progressHistory.isEmpty()) {
-            System.out.println("No member progress history available.");
-        } else {
-            for (MemberProgress progress : progressHistory) {
-                System.out.println(progress.toString());
-            }
+        System.out.println(String.format("| %-10s | %-20s | %-30s | %-15s |", "Member ID", "Name", "Email", "Membership Plan"));
+        System.out.println("-----------------------------------------------------------------------------------------------");
+        
+        for (Member member : members) {
+            System.out.println(String.format("| %-10d | %-20s | %-30s | %-15s |", 
+                member.getMemberId(),
+                member.getName(),
+                member.getEmail(),
+                member.getMembershipPlanId()
+            ));
         }
     }
 }

@@ -1,6 +1,8 @@
 package controllers;
 
 import models.MemberProgress;
+import repositories.MemberProgressRepository;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +11,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MemberProgressController {
-    private List<MemberProgress> memberProgressList = new ArrayList<>();
+    private final MemberProgressRepository memberProgressRepository = new MemberProgressRepository();
+    private final List<MemberProgress> memberProgressList = new ArrayList<>();
+
+    public MemberProgressController() {
+        this.memberProgressList.addAll(memberProgressRepository.getAllMemberProgress());
+    }
 
     public MemberProgress createMemberProgress(Scanner scanner) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -37,24 +44,18 @@ public class MemberProgressController {
 
         System.out.print("Enter BMI: ");
         float bmi = scanner.nextFloat();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         System.out.print("Enter Member ID: ");
         String memberId = scanner.nextLine();
 
         MemberProgress newProgress = new MemberProgress(progressId, progressDate, muscleTrain, bodyweight, height, bmi, memberId);
-        addMemberProgress(newProgress);
-        System.out.println("Member progress created successfully!");
-        return newProgress;
-    }
 
-    public void addMemberProgress(MemberProgress progress) {
-        if (progress != null) {
-            memberProgressList.add(progress);
-            System.out.println("Progress added.");
-        } else {
-            System.out.println("Invalid progress entry.");
-        }
+        memberProgressRepository.addMemberProgress(newProgress);
+        memberProgressList.add(newProgress);
+        System.out.println("Member progress created successfully!");
+        
+        return newProgress;
     }
 
     public boolean updateMemberProgress(String progressId, Scanner scanner) {
@@ -88,6 +89,7 @@ public class MemberProgressController {
             progress.setBmi(Float.parseFloat(bmiInput));
         }
 
+        memberProgressRepository.updateMemberProgress(progress);
         System.out.println("Member progress updated successfully.");
         return true;
     }
@@ -96,6 +98,7 @@ public class MemberProgressController {
         MemberProgress progress = getProgressById(progressId);
         if (progress != null) {
             memberProgressList.remove(progress);
+            memberProgressRepository.deleteMemberProgress(progressId);
             System.out.println("Member progress deleted successfully.");
             return true;
         }
@@ -126,27 +129,13 @@ public class MemberProgressController {
         }
     }
 
-    public MemberProgress getProgressById(String memberId) {
+    public MemberProgress getProgressById(String progressId) {
         for (MemberProgress progress : memberProgressList) {
-            if (progress.getMemberId().equals(memberId)) {
+            if (progress.getProgressId().equals(progressId)) {
                 return progress;
             }
         }
-        return null;
-    }
-
-    public MemberProgress getProgressByDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date parseDate = sdf.parse(date);
-            for (MemberProgress progress : memberProgressList) {
-                if (sdf.format(progress.getProgressDate()).equals(sdf.format(parseDate))) {
-                    return progress;
-                }
-            }
-        } catch (ParseException e) {
-            System.out.println("Invalid date format. Use dd/MM/yyyy.");
-        }
+        System.out.println("Progress not found in memory.");
         return null;
     }
 }

@@ -1,6 +1,8 @@
 package controllers;
 
 import models.Payment;
+import repositories.PaymentRepository;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +11,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PaymentController {
-    private List<Payment> payments = new ArrayList<>();
+    private final PaymentRepository paymentRepository = new PaymentRepository();
+    private final List<Payment> payments = new ArrayList<>();
+
+    public PaymentController() {
+        this.payments.addAll(paymentRepository.getAllPayments());
+    }
 
     public Payment createPayment(Scanner scanner) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -43,18 +50,12 @@ public class PaymentController {
         String memberId = scanner.nextLine();
 
         Payment newPayment = new Payment(paymentId, datePay, loan, moneyPaid, paymentStatus, paymentMethod, memberId);
-        addPayment(newPayment);
-        System.out.println("Payment created successfully!");
-        return newPayment;
-    }
 
-    public void addPayment(Payment payment) {
-        if (payment != null) {
-            payments.add(payment);
-            System.out.println("Payment added successfully.");
-        } else {
-            System.out.println("Invalid payment details.");
-        }
+        paymentRepository.addPayment(newPayment);
+        payments.add(newPayment);
+        System.out.println("Payment created successfully!");
+
+        return newPayment;
     }
 
     public boolean updatePayment(String paymentId, Date newDatePay, Integer newLoan, Integer newMoneyPaid, String newPaymentStatus, String newPaymentMethod) {
@@ -65,6 +66,8 @@ public class PaymentController {
             payment.setMoneyPaid(newMoneyPaid);
             payment.setPaymentStatus(newPaymentStatus);
             payment.setPaymentMethod(newPaymentMethod);
+
+            paymentRepository.updatePayment(payment);
             System.out.println("Payment updated successfully.");
             return true;
         }
@@ -76,6 +79,7 @@ public class PaymentController {
         Payment payment = getPaymentById(paymentId);
         if (payment != null) {
             payments.remove(payment);
+            paymentRepository.deletePayment(paymentId);
             System.out.println("Payment deleted successfully.");
             return true;
         }
@@ -89,6 +93,7 @@ public class PaymentController {
                 return payment;
             }
         }
+        System.out.println("Payment not found in memory.");
         return null;
     }
 

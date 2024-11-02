@@ -1,21 +1,23 @@
 package controllers;
 
 import models.Member;
+import repositories.MemberRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class MemberController {
-    private List<Member> members = new ArrayList<>();
+    private final MemberRepository memberRepository = new MemberRepository();
+    private final List<Member> members = new ArrayList<>();
 
-    public List<Member> getMembers() {
-        return members;
+    public MemberController() {
+        this.members.addAll(memberRepository.getAllMembers());
     }
-    
+
     public Member createMember(Scanner scanner) {
         System.out.print("Enter Member's ID: ");
         String memberId = scanner.nextLine();
-        scanner.nextLine(); 
 
         System.out.print("Enter Member's Name: ");
         String memberName = scanner.nextLine();
@@ -27,25 +29,21 @@ public class MemberController {
         String membershipPlanId = scanner.nextLine();
 
         Member member = new Member(memberId, memberName, memberEmail, membershipPlanId);
-        this.addMember(member);
-        return member;
-    }
 
-    public void addMember(Member member) {
-        if (member != null && member.getEmail().contains("@")) {
-            members.add(member);
-            System.out.println("Member added successfully.");
-        } else {
-            System.out.println("Invalid member details.");
-        }
+        memberRepository.addMember(member);
+        members.add(member);
+        System.out.println("Member added successfully.");
+        
+        return member;
     }
 
     public Member getMemberByID(String memberID) {
         for (Member member : members) {
-            if (member.getMemberId() == memberID) {
+            if (member.getMemberId().equals(memberID)) {
                 return member;
             }
         }
+        System.out.println("Member not found.");
         return null;
     }
 
@@ -58,6 +56,8 @@ public class MemberController {
             }
             member.setEmail(newEmail);
             member.setMembershipPlanId(newMembershipPlan);
+
+            memberRepository.updateMember(memberID, newName, newEmail, newMembershipPlan);
             System.out.println("Member updated successfully.");
             return true;
         }
@@ -69,6 +69,7 @@ public class MemberController {
         Member member = getMemberByID(memberID);
         if (member != null) {
             members.remove(member);
+            memberRepository.deleteMember(memberID);
             System.out.println("Member deleted successfully.");
             return true;
         }
@@ -84,14 +85,19 @@ public class MemberController {
 
         System.out.println(String.format("| %-10s | %-20s | %-30s | %-15s |", "Member ID", "Name", "Email", "Membership Plan"));
         System.out.println("-----------------------------------------------------------------------------------------------");
-        
+
         for (Member member : members) {
-            System.out.println(String.format("| %-10d | %-20s | %-30s | %-15s |", 
+            System.out.println(String.format("| %-10s | %-20s | %-30s | %-15s |",
                 member.getMemberId(),
                 member.getName(),
                 member.getEmail(),
                 member.getMembershipPlanId()
             ));
         }
+    }
+
+    public void reloadMembersFromDatabase() {
+        members.clear();
+        members.addAll(memberRepository.getAllMembers());
     }
 }

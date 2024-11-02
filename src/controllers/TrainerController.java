@@ -1,53 +1,47 @@
 package controllers;
 
 import models.Trainer;
+import repositories.TrainerRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class TrainerController {
-    private List<Trainer> trainers = new ArrayList<>();
+    private final TrainerRepository trainerRepository = new TrainerRepository();
+    private final List<Trainer> trainers = new ArrayList<>();
 
-    public Trainer createTrainer (Scanner scanner) {
-        System.out.println("Enter Trainer's ID: ");
+    public TrainerController() {
+        this.trainers.addAll(trainerRepository.getAllTrainers());
+    }
+
+    public Trainer createTrainer(Scanner scanner) {
+        System.out.print("Enter Trainer's ID: ");
         String trainerId = scanner.nextLine();
 
-        System.out.println("Enter Trainer's Name: ");
+        System.out.print("Enter Trainer's Name: ");
         String trainerName = scanner.nextLine();
 
-        System.out.println("Enter Trainer's Specialization: ");
+        System.out.print("Enter Trainer's Specialization: ");
         String trainerSpecialization = scanner.nextLine();
 
         Trainer trainer = new Trainer(trainerId, trainerName, trainerSpecialization);
-        this.addTrainer(trainer);
+
+        trainerRepository.addTrainer(trainer);
+        trainers.add(trainer);
+        System.out.println("Trainer added successfully.");
+        
         return trainer;
     }
-    
-    public void addTrainer(Trainer trainer) {
-        if (trainer != null) {
-            trainers.add(trainer);
-            System.out.println("Trainer added.");
-        } else {
-            System.out.println("Invalid trainer details.");
-        }
-    }
 
-    public Trainer getTrainerByID(String trainerID) {
+    public Trainer getTrainerByID(String trainerId) {
         for (Trainer trainer : trainers) {
-            if (trainer.getTrainerId() == trainerID) {
+            if (trainer.getTrainerId().equals(trainerId)) {
                 return trainer;
             }
         }
+        System.out.println("Trainer not found.");
         return null;
-    }
-
-    public boolean deleteTrainer(String trainerID) {
-        Trainer trainer = getTrainerByID(trainerID);
-        if (trainer != null) {
-            trainers.remove(trainer);
-            return true;
-        }
-        return false;
     }
 
     public boolean updateTrainer(String trainerId, String newName, String newSpecialization) {
@@ -55,8 +49,24 @@ public class TrainerController {
         if (trainer != null) {
             trainer.setName(newName);
             trainer.setSpecialization(newSpecialization);
+
+            trainerRepository.updateTrainer(trainerId, newName, newSpecialization);
+            System.out.println("Trainer updated successfully.");
             return true;
         }
+        System.out.println("Trainer not found.");
+        return false;
+    }
+
+    public boolean deleteTrainer(String trainerId) {
+        Trainer trainer = getTrainerByID(trainerId);
+        if (trainer != null) {
+            trainers.remove(trainer);
+            trainerRepository.deleteTrainer(trainerId);
+            System.out.println("Trainer deleted successfully.");
+            return true;
+        }
+        System.out.println("Trainer not found.");
         return false;
     }
 
@@ -68,14 +78,18 @@ public class TrainerController {
 
         System.out.println(String.format("| %-10s | %-20s | %-20s |", "Trainer ID", "Name", "Specialization"));
         System.out.println("------------------------------------------------------------");
-        
+
         for (Trainer trainer : trainers) {
-            System.out.println(String.format("| %-10d | %-20s | %-20s |", 
+            System.out.println(String.format("| %-10s | %-20s | %-20s |",
                 trainer.getTrainerId(),
                 trainer.getName(),
                 trainer.getSpecialization()
             ));
         }
     }
-    
+
+    public void reloadTrainersFromDatabase() {
+        trainers.clear();
+        trainers.addAll(trainerRepository.getAllTrainers());
+    }
 }

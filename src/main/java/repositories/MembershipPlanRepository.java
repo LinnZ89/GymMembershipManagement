@@ -14,7 +14,7 @@ import java.util.List;
 public class MembershipPlanRepository {
 
     public void addMembershipPlan(MembershipPlan plan) {
-        String sql = "INSERT INTO MembershipPlans (planId, Day_Start, Day_End, planType, price, status, memberId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MembershipPlans (planId, Day_Start, Day_End, planType, price, status) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -24,7 +24,6 @@ public class MembershipPlanRepository {
             pstmt.setString(4, plan.getPlanType());
             pstmt.setDouble(5, plan.getPrice());
             pstmt.setString(6, plan.getStatus());
-            pstmt.setString(7, plan.getMemberId());
 
             pstmt.executeUpdate();
             System.out.println("Membership plan added to database successfully.");
@@ -83,8 +82,7 @@ public class MembershipPlanRepository {
                     rs.getDate("Day_End"),   // Day_End
                     rs.getString("planType"),
                     rs.getDouble("price"),
-                    rs.getString("status"),
-                    rs.getString("memberId")
+                    rs.getString("status")
                 ));
             }
         } catch (SQLException e) {
@@ -109,8 +107,7 @@ public class MembershipPlanRepository {
                     rs.getDate("Day_End"),   // Day_End
                     rs.getString("planType"),
                     rs.getDouble("price"),
-                    rs.getString("status"),
-                    rs.getString("memberId")
+                    rs.getString("status")
                 );
             }
         } catch (SQLException e) {

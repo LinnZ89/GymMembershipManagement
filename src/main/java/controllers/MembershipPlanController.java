@@ -56,10 +56,7 @@ public class MembershipPlanController {
             return null;
         }
 
-        System.out.print("Enter Member ID associated with this plan: ");
-        String memberId = scanner.nextLine();
-
-        MembershipPlan newPlan = new MembershipPlan(planId, dayStart, dayEnd, planType, price, status, memberId);
+        MembershipPlan newPlan = new MembershipPlan(planId, dayStart, dayEnd, planType, price, status);
 
         // Add plan to both database and in-memory list
         membershipPlanRepository.addMembershipPlan(newPlan);
@@ -168,19 +165,18 @@ public class MembershipPlanController {
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        System.out.println(String.format("| %-10s | %-15s | %-10s | %-10s | %-12s | %-15s | %-10s |", 
-                                         "Plan ID", "Type", "Price", "Status", "Start Date", "End Date", "Member ID"));
+        System.out.println(String.format("| %-10s | %-15s | %-10s | %-10s | %-12s | %-15s |", 
+                                         "Plan ID", "Type", "Price", "Status", "Start Date", "End Date"));
         System.out.println("-------------------------------------------------------------------------------------------");
 
         for (MembershipPlan plan : membershipPlans) {
-            System.out.println(String.format("| %-10s | %-15s | %-10.2f | %-10s | %-12s | %-15s | %-10s |", 
+            System.out.println(String.format("| %-10s | %-15s | %-10.2f | %-10s | %-12s | %-15s |", 
                                              plan.getPlanId(),
                                              plan.getPlanType(),
                                              plan.getPrice(),
                                              plan.getStatus(),
                                              dateFormat.format(plan.getDayStart()),
-                                             dateFormat.format(plan.getDayEnd()),
-                                             plan.getMemberId()));
+                                             dateFormat.format(plan.getDayEnd())));
         }
     }
 

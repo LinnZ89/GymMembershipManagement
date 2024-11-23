@@ -36,17 +36,17 @@ public class MemberProgressController {
         System.out.print("Enter Muscle Trained: ");
         String muscleTrain = scanner.nextLine();
 
-        System.out.print("Enter Bodyweight: ");
+        System.out.print("Enter Bodyweight (kg): ");
         float bodyweight = scanner.nextFloat();
 
-        System.out.print("Enter Height: ");
+        System.out.print("Enter Height (m): ");
         float height = scanner.nextFloat();
 
-        System.out.print("Enter BMI: ");
-        float bmi = scanner.nextFloat();
-        scanner.nextLine(); 
+        // Calculate BMI
+        float bmi = calculateBMI(bodyweight, height);
 
         System.out.print("Enter Member ID: ");
+        scanner.nextLine(); // Consume the newline character
         String memberId = scanner.nextLine();
 
         MemberProgress newProgress = new MemberProgress(progressId, progressDate, muscleTrain, bodyweight, height, bmi, memberId);
@@ -71,22 +71,22 @@ public class MemberProgressController {
             progress.setMuscleTrain(newMuscleTrain);
         }
 
-        System.out.print("Enter new Bodyweight (current: " + progress.getBodyweight() + "): ");
+        System.out.print("Enter new Bodyweight (current: " + progress.getBodyweight() + " kg): ");
         String bodyweightInput = scanner.nextLine();
         if (!bodyweightInput.isEmpty()) {
-            progress.setBodyweight(Float.parseFloat(bodyweightInput));
+            float newBodyweight = Float.parseFloat(bodyweightInput);
+            progress.setBodyweight(newBodyweight);
+            // Recalculate BMI
+            progress.setBmi(calculateBMI(newBodyweight, progress.getHeight()));
         }
 
-        System.out.print("Enter new Height (current: " + progress.getHeight() + "): ");
+        System.out.print("Enter new Height (current: " + progress.getHeight() + " m): ");
         String heightInput = scanner.nextLine();
         if (!heightInput.isEmpty()) {
-            progress.setHeight(Float.parseFloat(heightInput));
-        }
-
-        System.out.print("Enter new BMI (current: " + progress.getBmi() + "): ");
-        String bmiInput = scanner.nextLine();
-        if (!bmiInput.isEmpty()) {
-            progress.setBmi(Float.parseFloat(bmiInput));
+            float newHeight = Float.parseFloat(heightInput);
+            progress.setHeight(newHeight);
+            // Recalculate BMI
+            progress.setBmi(calculateBMI(progress.getBodyweight(), newHeight));
         }
 
         memberProgressRepository.updateMemberProgress(progress);
@@ -137,5 +137,13 @@ public class MemberProgressController {
         }
         System.out.println("Progress not found in memory.");
         return null;
+    }
+
+    private float calculateBMI(float weight, float height) {
+        if (height <= 0) {
+            System.out.println("Height must be greater than zero to calculate BMI.");
+            return 0;
+        }
+        return weight / (height * height);
     }
 }

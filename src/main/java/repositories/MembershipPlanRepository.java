@@ -14,13 +14,13 @@ import java.util.List;
 public class MembershipPlanRepository {
 
     public void addMembershipPlan(MembershipPlan plan) {
-        String sql = "INSERT INTO MembershipPlan (planId, dayStart, dayEnd, planType, price, status, memberId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MembershipPlans (planId, Day_Start, Day_End, planType, price, status, memberId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, plan.getPlanId());
-            pstmt.setDate(2, new Date(plan.getDayStart().getTime()));
-            pstmt.setDate(3, new Date(plan.getDayEnd().getTime()));
+            pstmt.setDate(2, new Date(plan.getDayStart().getTime())); // Day_Start
+            pstmt.setDate(3, new Date(plan.getDayEnd().getTime()));   // Day_End
             pstmt.setString(4, plan.getPlanType());
             pstmt.setDouble(5, plan.getPrice());
             pstmt.setString(6, plan.getStatus());
@@ -35,15 +35,15 @@ public class MembershipPlanRepository {
     }
 
     public void updateMembershipPlan(MembershipPlan plan) {
-        String sql = "UPDATE MembershipPlan SET planType = ?, price = ?, status = ?, dayStart = ?, dayEnd = ? WHERE planId = ?";
+        String sql = "UPDATE MembershipPlans SET planType = ?, price = ?, status = ?, Day_Start = ?, Day_End = ? WHERE planId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, plan.getPlanType());
             pstmt.setDouble(2, plan.getPrice());
             pstmt.setString(3, plan.getStatus());
-            pstmt.setDate(4, new Date(plan.getDayStart().getTime()));
-            pstmt.setDate(5, new Date(plan.getDayEnd().getTime()));
+            pstmt.setDate(4, new Date(plan.getDayStart().getTime())); // Day_Start
+            pstmt.setDate(5, new Date(plan.getDayEnd().getTime()));   // Day_End
             pstmt.setString(6, plan.getPlanId());
 
             pstmt.executeUpdate();
@@ -55,7 +55,7 @@ public class MembershipPlanRepository {
     }
 
     public void deleteMembershipPlan(String planId) {
-        String sql = "DELETE FROM MembershipPlan WHERE planId = ?";
+        String sql = "DELETE FROM MembershipPlans WHERE planId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -71,7 +71,7 @@ public class MembershipPlanRepository {
 
     public List<MembershipPlan> getAllMembershipPlans() {
         List<MembershipPlan> membershipPlans = new ArrayList<>();
-        String sql = "SELECT * FROM MembershipPlan";
+        String sql = "SELECT * FROM MembershipPlans";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -79,8 +79,8 @@ public class MembershipPlanRepository {
             while (rs.next()) {
                 membershipPlans.add(new MembershipPlan(
                     rs.getString("planId"),
-                    rs.getDate("dayStart"),
-                    rs.getDate("dayEnd"),
+                    rs.getDate("Day_Start"), // Day_Start
+                    rs.getDate("Day_End"),   // Day_End
                     rs.getString("planType"),
                     rs.getDouble("price"),
                     rs.getString("status"),
@@ -95,7 +95,7 @@ public class MembershipPlanRepository {
     }
 
     public MembershipPlan getPlanById(String planId) {
-        String sql = "SELECT * FROM MembershipPlan WHERE planId = ?";
+        String sql = "SELECT * FROM MembershipPlans WHERE planId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -105,8 +105,8 @@ public class MembershipPlanRepository {
             if (rs.next()) {
                 return new MembershipPlan(
                     rs.getString("planId"),
-                    rs.getDate("dayStart"),
-                    rs.getDate("dayEnd"),
+                    rs.getDate("Day_Start"), // Day_Start
+                    rs.getDate("Day_End"),   // Day_End
                     rs.getString("planType"),
                     rs.getDouble("price"),
                     rs.getString("status"),

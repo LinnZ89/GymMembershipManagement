@@ -14,7 +14,7 @@ import java.util.List;
 public class MemberProgressRepository {
 
     public void addMemberProgress(MemberProgress progress) {
-        String sql = "INSERT INTO MemberProgress (progressId, progressDate, muscleTrain, bodyweight, height, bmi, memberId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MemberProgress (progressId, progressDate, muscleTrain, bodyweight, height, BMI, memberId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -23,7 +23,7 @@ public class MemberProgressRepository {
             pstmt.setString(3, progress.getMuscleTrain());
             pstmt.setFloat(4, progress.getBodyweight());
             pstmt.setFloat(5, progress.getHeight());
-            pstmt.setFloat(6, progress.getBmi());
+            pstmt.setFloat(6, progress.getBmi()); // Updated to match column 'BMI'
             pstmt.setString(7, progress.getMemberId());
 
             pstmt.executeUpdate();
@@ -35,14 +35,14 @@ public class MemberProgressRepository {
     }
 
     public void updateMemberProgress(MemberProgress progress) {
-        String sql = "UPDATE MemberProgress SET muscleTrain = ?, bodyweight = ?, height = ?, bmi = ? WHERE progressId = ?";
+        String sql = "UPDATE MemberProgress SET muscleTrain = ?, bodyweight = ?, height = ?, BMI = ? WHERE progressId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, progress.getMuscleTrain());
             pstmt.setFloat(2, progress.getBodyweight());
             pstmt.setFloat(3, progress.getHeight());
-            pstmt.setFloat(4, progress.getBmi());
+            pstmt.setFloat(4, progress.getBmi()); // Updated to match column 'BMI'
             pstmt.setString(5, progress.getProgressId());
 
             pstmt.executeUpdate();
@@ -82,7 +82,7 @@ public class MemberProgressRepository {
                     rs.getString("muscleTrain"),
                     rs.getFloat("bodyweight"),
                     rs.getFloat("height"),
-                    rs.getFloat("bmi"),
+                    rs.getFloat("BMI"), // Updated to match column 'BMI'
                     rs.getString("memberId")
                 ));
             }
@@ -108,7 +108,7 @@ public class MemberProgressRepository {
                     rs.getString("muscleTrain"),
                     rs.getFloat("bodyweight"),
                     rs.getFloat("height"),
-                    rs.getFloat("bmi"),
+                    rs.getFloat("BMI"), // Updated to match column 'BMI'
                     rs.getString("memberId")
                 );
             }

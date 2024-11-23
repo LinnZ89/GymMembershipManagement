@@ -11,7 +11,6 @@ public class Payment {
     private String paymentMethod;
     private String memberId;
 
-    // Constructor
     public Payment(String paymentId, Date datePay, Integer loan, Integer moneyPaid, String paymentStatus, String paymentMethod, String memberId) {
         this.paymentId = paymentId;
         this.datePay = datePay;
@@ -22,7 +21,6 @@ public class Payment {
         this.memberId = memberId;
     }
 
-    // Getters and Setters
     public String getPaymentId() {
         return paymentId;
     }
@@ -79,7 +77,6 @@ public class Payment {
         this.memberId = memberId;
     }
 
-    // toString method
     @Override
     public String toString() {
         return "Payment [paymentId=" + paymentId + ", datePay=" + datePay + ", loan=" + loan + 

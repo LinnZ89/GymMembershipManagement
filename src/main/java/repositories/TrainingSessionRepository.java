@@ -14,13 +14,13 @@ import java.util.List;
 public class TrainingSessionRepository {
 
     public void addTrainingSession(TrainingSession session) {
-        String sql = "INSERT INTO TrainingSessions (sessionId, dayStart, dayEnd, sessionLocation, memberId, trainerId) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO TrainingSessions (sessionId, Day_Start, Day_End, sessionLocation, memberId, trainerId) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, session.getSessionId());
-            pstmt.setDate(2, new Date(session.getDayStart().getTime()));
-            pstmt.setDate(3, new Date(session.getDayEnd().getTime()));
+            pstmt.setDate(2, new Date(session.getDayStart().getTime())); // Updated to `Day_Start`
+            pstmt.setDate(3, new Date(session.getDayEnd().getTime()));   // Updated to `Day_End`
             pstmt.setString(4, session.getSessionLocation());
             pstmt.setString(5, session.getMemberId());
             pstmt.setString(6, session.getTrainerId());
@@ -75,8 +75,8 @@ public class TrainingSessionRepository {
             while (rs.next()) {
                 trainingSessions.add(new TrainingSession(
                     rs.getString("sessionId"),
-                    rs.getDate("dayStart"),
-                    rs.getDate("dayEnd"),
+                    rs.getDate("Day_Start"), // Updated to `Day_Start`
+                    rs.getDate("Day_End"),   // Updated to `Day_End`
                     rs.getString("sessionLocation"),
                     rs.getString("memberId"),
                     rs.getString("trainerId")
@@ -100,8 +100,8 @@ public class TrainingSessionRepository {
             if (rs.next()) {
                 return new TrainingSession(
                     rs.getString("sessionId"),
-                    rs.getDate("dayStart"),
-                    rs.getDate("dayEnd"),
+                    rs.getDate("Day_Start"), // Updated to `Day_Start`
+                    rs.getDate("Day_End"),   // Updated to `Day_End`
                     rs.getString("sessionLocation"),
                     rs.getString("memberId"),
                     rs.getString("trainerId")

@@ -1,6 +1,8 @@
 package controllers;
 
 import models.TrainingSession;
+import repositories.TrainingSessionRepository;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +11,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TrainingSessionController {
-    private List<TrainingSession> trainingSessions = new ArrayList<>();
+    private final TrainingSessionRepository trainingSessionRepository = new TrainingSessionRepository();
+    private final List<TrainingSession> trainingSessions = new ArrayList<>();
+
+    public TrainingSessionController() {
+        this.trainingSessions.addAll(trainingSessionRepository.getAllTrainingSessions());
+    }
 
     public TrainingSession createTrainingSession(Scanner scanner) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -18,7 +25,7 @@ public class TrainingSessionController {
         String sessionId = scanner.nextLine();
 
         System.out.print("Enter Start Date (dd/MM/yyyy): ");
-        Date dayStart = null;
+        Date dayStart;
         try {
             dayStart = dateFormat.parse(scanner.nextLine());
         } catch (ParseException e) {
@@ -27,7 +34,7 @@ public class TrainingSessionController {
         }
 
         System.out.print("Enter End Date (dd/MM/yyyy): ");
-        Date dayEnd = null;
+        Date dayEnd;
         try {
             dayEnd = dateFormat.parse(scanner.nextLine());
             if (dayEnd.before(dayStart)) {
@@ -49,29 +56,12 @@ public class TrainingSessionController {
         String trainerId = scanner.nextLine();
 
         TrainingSession newSession = new TrainingSession(sessionId, dayStart, dayEnd, sessionLocation, memberId, trainerId);
-        this.addTrainingSession(newSession);
+
+        trainingSessionRepository.addTrainingSession(newSession);
+        trainingSessions.add(newSession);
         System.out.println("Training session created successfully!");
+
         return newSession;
-    }
-
-    public void addTrainingSession(TrainingSession session) {
-        if (session != null && session.getDayStart().before(session.getDayEnd())) {
-            trainingSessions.add(session);
-            System.out.println("Training session added.");
-        } else {
-            System.out.println("Invalid session details.");
-        }
-    }
-
-    public boolean deleteTrainingSession(String sessionId) {
-        TrainingSession session = getSessionById(sessionId);
-        if (session != null) {
-            trainingSessions.remove(session);
-            System.out.println("Training session deleted successfully.");
-            return true;
-        }
-        System.out.println("Training session not found.");
-        return false;
     }
 
     public boolean updateTrainingSession(String sessionId, String newLocation, String newTrainerId) {
@@ -79,6 +69,8 @@ public class TrainingSessionController {
         if (session != null) {
             session.setSessionLocation(newLocation);
             session.setTrainerId(newTrainerId);
+
+            trainingSessionRepository.updateTrainingSession(session);
             System.out.println("Training session updated successfully.");
             return true;
         }
@@ -86,12 +78,25 @@ public class TrainingSessionController {
         return false;
     }
 
-    public TrainingSession getSessionById(String trainingSessionId) {
-        for (TrainingSession trainingSession : trainingSessions) {
-            if (trainingSession.getMemberId() == trainingSessionId) {
-                return trainingSession;
+    public boolean deleteTrainingSession(String sessionId) {
+        TrainingSession session = getSessionById(sessionId);
+        if (session != null) {
+            trainingSessions.remove(session);
+            trainingSessionRepository.deleteTrainingSession(sessionId);
+            System.out.println("Training session deleted successfully.");
+            return true;
+        }
+        System.out.println("Training session not found.");
+        return false;
+    }
+
+    public TrainingSession getSessionById(String sessionId) {
+        for (TrainingSession session : trainingSessions) {
+            if (session.getSessionId().equals(sessionId)) {
+                return session;
             }
         }
+        System.out.println("Training session not found in memory.");
         return null;
     }
 

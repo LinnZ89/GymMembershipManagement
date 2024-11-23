@@ -13,12 +13,12 @@ import java.util.List;
 public class TrainerRepository {
 
     public void addTrainer(Trainer trainer) {
-        String sql = "INSERT INTO Trainers (trainerId, name, specialization) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Trainers (trainerId, t_name, specialization) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, trainer.getTrainerId());
-            pstmt.setString(2, trainer.getName());
+            pstmt.setString(2, trainer.getName()); // Updated column name to `t_name`
             pstmt.setString(3, trainer.getSpecialization());
 
             pstmt.executeUpdate();
@@ -30,11 +30,11 @@ public class TrainerRepository {
     }
 
     public void updateTrainer(String trainerId, String newName, String newSpecialization) {
-        String sql = "UPDATE Trainers SET name = ?, specialization = ? WHERE trainerId = ?";
+        String sql = "UPDATE Trainers SET t_name = ?, specialization = ? WHERE trainerId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, newName);
+            pstmt.setString(1, newName); // Updated column name to `t_name`
             pstmt.setString(2, newSpecialization);
             pstmt.setString(3, trainerId);
 
@@ -42,6 +42,7 @@ public class TrainerRepository {
             System.out.println("Trainer updated in database successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Error updating trainer in database.");
         }
     }
 
@@ -56,6 +57,7 @@ public class TrainerRepository {
             System.out.println("Trainer deleted from database successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Error deleting trainer from database.");
         }
     }
 
@@ -69,7 +71,7 @@ public class TrainerRepository {
             while (rs.next()) {
                 trainers.add(new Trainer(
                     rs.getString("trainerId"),
-                    rs.getString("name"),
+                    rs.getString("t_name"), // Updated column name to `t_name`
                     rs.getString("specialization")
                 ));
             }
@@ -91,12 +93,13 @@ public class TrainerRepository {
             if (rs.next()) {
                 return new Trainer(
                     rs.getString("trainerId"),
-                    rs.getString("name"),
+                    rs.getString("t_name"), // Updated column name to `t_name`
                     rs.getString("specialization")
                 );
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Error fetching trainer by ID from database.");
         }
         System.out.println("Trainer not found in database.");
         return null;
